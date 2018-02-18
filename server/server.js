@@ -21,6 +21,29 @@ app.post("/todos", (req, res) => {
   });
 });
 
+app.get("/todos", (req, res) => {
+  Todo.find().then((docs) => {
+    res.send({
+      docs,
+      statusCode: 200
+    });
+  })
+  .catch((err) => {
+    res.send(err);
+  });
+});
+
+app.get("/todos/:id", (req, res) => {
+  var todoID = req.params.id;
+
+  Todo.find({_id: todoID}).then((doc) => {
+    res.send(doc);
+  })
+  .catch((err) => {
+    res.status(400).send(err);
+  });
+});
+
 app.listen("3000", () => {
   console.log("Started On Port 3000");
 });
