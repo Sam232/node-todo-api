@@ -54,7 +54,7 @@ app.get("/todos/:id", (req, res) => {
       res.status(400).send(err);
     });
   }
-  res.send({
+  res.status(400).send({
     message: "Invalid Todo Id Provided.",
     statusCode: 400
   });

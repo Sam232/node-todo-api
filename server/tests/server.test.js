@@ -1,14 +1,15 @@
 const request = require("supertest");
 const expect = require("expect");
+const {ObjectID} = require("mongoDB");
 
 const {app} = require("../server");
 const {Todo} = require("../models/Todo");
 
 const todos = [{
-  _id: "5a8d10a4b8c75d1ea43b3675",
+  _id: new ObjectID(),
   text: "First test todo"
 }, {
-  _id: "5a8d10a4b8c75d1ea43b3678",
+  _id: new ObjectID(),
   text: "Second test todo"
 }];
 
@@ -19,7 +20,7 @@ beforeEach((done) => {
   .catch((err) => done(err));
 });
 
-describe("Node Todo API First Test", () => {
+describe("POST /todos", () => {
   it("should make a post request to this endpoint /todos", (done) => {
     request(app)
       .post("/todos")
@@ -43,9 +44,7 @@ describe("Node Todo API First Test", () => {
         })
       });
   });
-});
 
-describe("Node Todo API Second Test", () => {
   it("should make a post request to this endpoint /todos and receive back an error", (done) => {
     request(app)
       .post("/todos")
@@ -66,7 +65,7 @@ describe("Node Todo API Second Test", () => {
   });
 });
 
-describe("Node API Third Test", () => {
+describe("GET /todo", () => {
   it("should make a get HTTP request to this endpoint /todos", (done) => {
     request(app)
       .get("/todos")
@@ -78,13 +77,13 @@ describe("Node API Third Test", () => {
   });
 });
 
-describe("Node API Fourth Test", () => {
+describe("GET /todos/:id", () => {
   it("should make an HTTP GET request to this endpoint /todos/:id and fetch a single todo", (done) => {
     request(app)
-      .get("/todos/5a8d10a4b8c75d1ea43b3675")
+      .get(`/todos/${todos[0]._id.toHexString()}`)
       .expect(200)
       .expect((res) => {
-        expect(res.body[0]._id).toBe("5a8d10a4b8c75d1ea43b3675");
+        expect(res.body.doc._id).toBe(todos[0]._id.toHexString());
       })
       .end((err, res) => {
         if(err){
@@ -93,5 +92,33 @@ describe("Node API Fourth Test", () => {
         }
         done();
       });
+  });
+
+  it("should test for a todo having an invalid id", (done) => {
+    request(app)
+      .get("/todos/5a8d10a4b8c75d1ea43b3")
+      .expect(400)
+      .end((err, res) => {
+        if(err){
+          return done(err);
+        }
+        expect(res.body.message).toBe("Invalid Todo Id Provided.");
+        done();
+      })
+  });
+
+  it("should test for an id that matches no todo id", (done) => {
+    var _id = new ObjectID();
+
+    request(app)
+      .get(`/todos/${_id.toHexString()}`)
+      .expect(404)
+      .end((err, res) => {
+        if(err){
+          return done(err);
+        }
+        expect(res.body.message).toBe("No Todo's ID Matches The Provided ID.");
+        done();
+      })
   });
 });
