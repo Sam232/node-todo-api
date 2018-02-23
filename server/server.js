@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const {ObjectID} = require("mongodb");
 
 const {mongoose} = require("./db/mongoose");
 const {Todo} = require("./models/Todo");
@@ -36,11 +37,26 @@ app.get("/todos", (req, res) => {
 app.get("/todos/:id", (req, res) => {
   var todoID = req.params.id;
 
-  Todo.find({_id: todoID}).then((doc) => {
-    res.send(doc);
-  })
-  .catch((err) => {
-    res.status(400).send(err);
+  if(ObjectID.isValid(todoID)){
+    return Todo.findById(todoID).then((doc) => {
+      if(doc){
+        return res.send({
+          doc,
+          statusCode: 200
+        });
+      }
+      res.status(404).send({
+        message: "No Todo's ID Matches The Provided ID.",
+        statusCode: 404
+      });
+    })
+    .catch((err) => {
+      res.status(400).send(err);
+    });
+  }
+  res.send({
+    message: "Invalid Todo Id Provided.",
+    statusCode: 400
   });
 });
 

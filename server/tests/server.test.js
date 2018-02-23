@@ -5,8 +5,10 @@ const {app} = require("../server");
 const {Todo} = require("../models/Todo");
 
 const todos = [{
+  _id: "5a8d10a4b8c75d1ea43b3675",
   text: "First test todo"
 }, {
+  _id: "5a8d10a4b8c75d1ea43b3678",
   text: "Second test todo"
 }];
 
@@ -73,5 +75,23 @@ describe("Node API Third Test", () => {
         expect(res.body.docs.length).toBe(2);
       })
       .end(done);
+  });
+});
+
+describe("Node API Fourth Test", () => {
+  it("should make an HTTP GET request to this endpoint /todos/:id and fetch a single todo", (done) => {
+    request(app)
+      .get("/todos/5a8d10a4b8c75d1ea43b3675")
+      .expect(200)
+      .expect((res) => {
+        expect(res.body[0]._id).toBe("5a8d10a4b8c75d1ea43b3675");
+      })
+      .end((err, res) => {
+        if(err){
+          return console.log(err);
+          done(err);
+        }
+        done();
+      });
   });
 });
