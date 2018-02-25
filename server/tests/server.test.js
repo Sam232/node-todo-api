@@ -122,3 +122,52 @@ describe("GET /todos/:id", () => {
       })
   });
 });
+
+describe("DELETE /todos/:id", () => {
+  it("should make a DELETE HTTP REQUEST to this endpoint /todos/:id and receive back the deleted todo", (done) => {
+    var todoID = todos[0]._id.toHexString();
+    request(app)
+      .delete(`/todos/${todoID}`)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.deletedTodo._id).toBe(todoID);
+      })
+      .end((err,res) => {
+        if(err){
+          return done(err);
+        }
+
+        Todo.findById(todoID).then((doc) => {
+          expect(doc).toNotExist();
+          done();
+        })
+        .catch((e) => {
+          done(e);
+        });
+      });
+  });
+
+  it("should make a DELETE HTTP REQUEST to this endpoint /todos/:id and receive invalid id as error message", (done) => {
+    request(app)
+      .delete("/todos/5a92ad5d517e2b0014dfb9")
+      .expect(400)
+      .end((err, res) => {
+        if(err){
+          return done(err);
+        }
+        done();
+      });
+  });
+
+  it("should make a DELETE HTTP REQUEST to this endpoint /todos/:id and receive back 404 as error message", (done) => {
+    request(app)
+      .delete("/todos/5a92ad5d517e2b0014dfb9d1")
+      .expect(404)
+      .end((err, res) => {
+        if(err){
+          done(err);
+        }
+        done();
+      });
+  });
+});
