@@ -60,6 +60,38 @@ app.get("/todos/:id", (req, res) => {
   });
 });
 
+app.delete("/todos/:id", (req, res) => {
+  todoID = req.params.id;
+
+  if(ObjectID.isValid(todoID)){
+    return Todo.findByIdAndRemove(todoID).then((doc) => {
+      if(doc){
+        return res.send({
+          deletedTodo: doc,
+          statusCode: 200
+        });
+      }
+
+      res.status(404).send({
+        message: "No Todo\'s ID Matches The Provided ID",
+        statusCode: 404
+      });
+
+    })
+    .catch((e) => {
+      res.status(400).send({
+        message: "Unable Process Request",
+        statusCode: 400
+      });
+    });
+  }
+
+  res.status(400).send({
+    message: "Invalid Todo ID Provided",
+    statusCode: 400
+  });
+});
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Started On Port ${port}`);
