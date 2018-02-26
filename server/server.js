@@ -115,9 +115,9 @@ app.patch("/todos/:id/", (req, res) => {
             statusCode: 200
           });
         }
-        res.status(400).send({
+        res.status(404).send({
           message: "No Todo\'s ID Matches The Provided ID",
-          statusCode: 400
+          statusCode: 404
         });
       })
       .catch((e) => {

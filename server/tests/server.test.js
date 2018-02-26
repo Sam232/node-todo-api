@@ -10,7 +10,9 @@ const todos = [{
   text: "First test todo"
 }, {
   _id: new ObjectID(),
-  text: "Second test todo"
+  text: "Second test todo",
+  completed: true,
+  completedAt: 333
 }];
 
 beforeEach((done) => {
@@ -170,4 +172,54 @@ describe("DELETE /todos/:id", () => {
         done();
       });
   });
+});
+
+describe("PATCH /todos/:id", () => {
+  it("should make an HTTP PATCH REQUEST to this endpoint /todos/:id and update a todo and also set completed to true", (done) => {
+    var todoID = todos[1]._id.toHexString();
+    request(app)
+      .patch(`/todos/${todoID}`)
+      .send({
+        text: "Develop A Mobile App",
+        completed: true
+      })
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.doc.completed).toBe(true);
+        expect(res.body.doc.text).toBe("Develop A Mobile App");
+        expect(res.body.doc.completedAt).toBeA("number");
+      })
+      .end(done);
+  });
+
+  it("should make and HTTP PATCH REQUEST to this endpoint /todos/:id and update a todo and also set completed to false", (done) => {
+    request(app)
+      .patch(`/todos/${todos[1]._id.toHexString()}`)
+      .send({
+        text: "Cook Dinner",
+        completed: false
+      })
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.doc.text).toBe("Cook Dinner");
+        expect(res.body.doc.completed).toBe(false);
+        expect(res.body.doc.completedAt).toNotExist();
+      })
+      .end(done);
+  });
+
+  // it("should make an HTTP PATCH REQUEST to this endpoint and receive todo not found as error", (done) => {
+  //   request(app)
+  //     .patch("/todos/5a91e9304433e90014a7c8dd")
+  //     .send({
+  //       text: "Cook Dinner"
+  //     })
+  //     .expect(404)
+  //     .end((err, res) => {
+  //       if(err){
+  //         return done(err);
+  //       }
+  //       done();
+  //     })
+  // });
 });
