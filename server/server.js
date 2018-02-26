@@ -95,7 +95,7 @@ app.delete("/todos/:id", (req, res) => {
 
 app.patch("/todos/:id/", (req, res) => {
   var todoID = req.params.id;
-  var body = _.pick(req.body, ["text", "completedAt"]);
+  var body = _.pick(req.body, ["text", "completed"]);
 
   if(ObjectID.isValid(todoID)){
       if(_.isBoolean(body.completed) && body.completed){
